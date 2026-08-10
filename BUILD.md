@@ -36,7 +36,7 @@
 v0.2로 넘어가기 전에 반드시 한다. 순서:
 
 1. 이 저장소를 마켓플레이스로 추가하고 플러그인 설치
-2. 빈 폴더에서 세션을 열어 **SessionStart 훅이 대화를 여는지** 확인
+2. 빈 폴더에서 세션을 열고 **`/devoffice` 를 호출**해 대화가 시작되는지 확인
 3. 아이디어 → 이름 → PRD → 스택 → 계정 → 배포까지 **실제로 통과**
 4. 막힌 지점을 이 파일에 기록하고 고친다
 
@@ -101,7 +101,7 @@ v0.2로 넘어가기 전에 반드시 한다. 순서:
 | ID | 작업 | 상태 | 의존 | 결과물 |
 |---|---|---|---|---|
 | D0 | 훅 공통 유틸 (fail-open) | ✅ | — | `hooks/lib/hook.js` |
-| D1 | `SessionStart` — 상태 주입 + **첫 발화 자동 투입** | ✅ | B2 | `hooks/session-start.js` |
+| ~~D1~~ | ~~`SessionStart`~~ — **철회.** 플러그인이 먼저 말을 걸지 않는다 (D26') | 🚫 | — | 이어하기는 `devoffice` 스킬이 담당 |
 | D2 | `PreToolUse` — 비밀키·실데이터·폴더 밖 차단 | ✅ | A3 | `hooks/guard.js` |
 | D3 | `PostToolUseFailure` — 에러 번역 (사전 9종) | ✅ | A3 | `hooks/translate-error.js` |
 | D4 | `Stop` — 확인 안 받고 넘어가는 것 방지 | ✅ | B4 | `hooks/check-lock.js` |
@@ -232,8 +232,7 @@ BaaS를 쓰면 `infra` 는 영원히 안 켜지고, 웹만 만들면 `frontend` 
 | **매핑 안 된 AC 감지** (그레이 영역) | ✅ |
 | **기대 결과 없는 확인 항목 감지** + 어느 항목인지 지목 | ✅ |
 | `doctor` — Node·git·gh 점검 | ✅ |
-| SessionStart — 진행 상태 주입 | ✅ |
-| SessionStart — **남의 폴더는 가로채지 않음** | ✅ |
+| ~~SessionStart~~ | 🚫 철회 |
 | Stop — 확인 안 받은 기능 되짚기 | ✅ |
 | 에러 번역 (EADDRINUSE 등 9종) | ✅ |
 | **.env 스테이징된 채 커밋 차단** | ✅ |

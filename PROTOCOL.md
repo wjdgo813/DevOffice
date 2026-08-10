@@ -167,7 +167,7 @@ devoffice task block T4 --type TECH_WALL --note "..."
 
 ```
 worklog/backend.md    사람이 읽는 진행 기록
-state.json            현재 위치 (SessionStart 훅이 읽음)
+state.json            현재 위치 (스킬이 시작할 때 읽음)
 journal.jsonl         이벤트 로그 (Phase 2 GUI 연료)
 ```
 
@@ -179,7 +179,7 @@ journal.jsonl         이벤트 로그 (Phase 2 GUI 연료)
 ```
 사용자가 창을 닫음
         ↓
-다시 열림 → SessionStart 훅 → state.json 읽어 컨텍스트 주입
+다시 열림 → 사용자가 /devoffice 호출 → state.json 읽음
         ↓
 프로듀서: "지난번에 [댓글 기능]을 만들다가 [서버 작업 3개 중 2개]까지 했어요.
            이어서 할까요?"
@@ -613,7 +613,7 @@ devoffice doctor                         환경 점검 (멱등)
 
 | 이벤트 | 강제 내용 |
 |---|---|
-| `SessionStart` | `state.json` 주입 → 이어하기 (§3.3) |
+| ~~`SessionStart`~~ | 철회. 플러그인은 먼저 말을 걸지 않는다 (DESIGN D26') |
 | `SubagentStop` | 완료 보고서 없이 끝나면 경고 |
 | `Stop` | ❌ 남은 대조표를 두고 다음 기능으로 넘어가려 하면 차단 (§5.3) |
 | `PreToolUse(Bash)` | 비밀키 커밋 차단, 소유 밖 경로 쓰기 차단 |
