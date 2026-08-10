@@ -1,0 +1,14 @@
+# 개인 설정 — 사람마다 다르다
+.claude/settings.local.json
+
+# 환경 변수 (플러그인 자체는 쓰지 않지만 실수를 막는다)
+.env
+.env.*
+!.env.example
+
+# 테스트로 만든 제품 상자
+.devoffice/
+
+node_modules/
+.DS_Store
+*.tmp-*

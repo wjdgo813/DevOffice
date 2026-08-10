@@ -1,0 +1,14 @@
+{
+  "name": "devoffice",
+  "description": "비개발자가 대화만으로 제품을 만들 수 있게 하는 플러그인 모음",
+  "owner": {
+    "name": "DevOffice"
+  },
+  "plugins": [
+    {
+      "name": "devoffice",
+      "source": "./",
+      "description": "비개발자가 대화만으로 웹·앱 프로덕트를 만드는 개발 조직 플러그인"
+    }
+  ]
+}

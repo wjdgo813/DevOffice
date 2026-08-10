@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+  "name": "devoffice",
+  "displayName": "DevOffice",
+  "version": "0.1.0",
+  "description": "비개발자가 대화만으로 웹·앱 프로덕트를 만드는 개발 조직 플러그인",
+  "author": {
+    "name": "DevOffice"
+  },
+  "license": "MIT",
+  "keywords": ["non-developer", "product", "orchestration", "korean"],
+  "userConfig": {
+    "language": {
+      "type": "string",
+      "title": "대화 언어",
+      "description": "사용자 대면 출력과 산출물 문서의 언어입니다.",
+      "default": "ko"
+    },
+    "workspace": {
+      "type": "directory",
+      "title": "제품 폴더 위치",
+      "description": "만드시는 제품들이 저장될 폴더입니다.",
+      "default": "~/Documents/DevOffice"
+    }
+  }
+}
