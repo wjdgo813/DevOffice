@@ -187,6 +187,8 @@ BaaS를 쓰면 `infra` 는 영원히 안 켜지고, 웹만 만들면 `frontend` 
 | H3 | 스캐폴딩 — **덧씌우기 방식** | ✅ | H1 | `lib/project.js`, `templates/scaffold/web-next/` |
 | H5 | **`mobile-expo` 서식** — 실사용 검증 중 발견 | ✅ | H3 | `templates/scaffold/mobile-expo/` |
 | H6 | **앱 비용 안내 수정** — Xcode 유무로 분기 | ✅ | H1 | `skills/devoffice-architect/`, `devoffice-skeleton/` |
+| H7 | **Expo SDK 호환성 확인** — 만들기 전 `expo check`, 막혔을 때 `expo status` | ✅ | H5 | `lib/expo.js` |
+| H8 | **진단 규칙** — 확인 순서 사다리 5단계 | ✅ | — | `skills/_shared/diagnose.md` |
 | H4 | 배포 + 첫 화면 | ✅ | H3 | `skills/devoffice-skeleton/` |
 
 **v0.1 완료 조건:** 비개발자가 대화만으로 **배포된 첫 화면**을 갖는다 ✅ (실사용 검증 남음)

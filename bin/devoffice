@@ -18,6 +18,7 @@ const scaffold = require('../lib/scaffold');
 const gate = require('../lib/gate');
 const doctor = require('../lib/doctor');
 const project = require('../lib/project');
+const expo = require('../lib/expo');
 
 const argv = process.argv.slice(2);
 
@@ -63,6 +64,8 @@ function help() {
     'gate all                 위 전부',
     'doctor                   준비물 점검',
     'scaffold <프리셋>        첫 화면·설정 파일 덧씌우기',
+    'expo check               폰에 깔 수 있는 SDK 확인 (만들기 전)',
+    'expo status              앱이 폰에서 열릴 상태인지 진단',
     '',
     'journal add <종류> <내용>',
     'journal tail [n]',
@@ -71,11 +74,84 @@ function help() {
   ui.flush();
 }
 
+/**
+ * Expo Go 호환성. 만들기 전에 확인하고, 막혔을 때 진단한다.
+ * 추측할 필요가 없는 것을 추측하지 않게 하는 것이 목적이다.
+ */
+async function expoCommand(sub, root) {
+  if (sub === 'check' || !sub) {
+    const r = await expo.recommend();
+    if (!r.ok) {
+      ui.header('확인 못 했어요');
+      ui.line(r.reason === 'OFFLINE'
+        ? '인터넷이 안 되어 폰에 깔리는 버전을 확인하지 못했어요.'
+        : '버전 대응표를 해석하지 못했어요.');
+      ui.line();
+      ui.line('확인 못 한 채로 최신 버전을 쓰면 폰에서 안 열릴 수 있어요.');
+      ui.next('turn', '인터넷을 확인하고 다시 시도해주세요');
+      return ui.flush(), 1;
+    }
+
+    ui.header('폰에 깔 수 있는 버전', `SDK ${r.sdk}`);
+    ui.lines([
+      `App Store 의 Expo Go   ${r.store.version}`,
+      `그래서 써야 할 SDK      ${r.sdk}`,
+      r.behind > 0 ? `가장 새 SDK 는 ${r.latestSdk} 이지만 폰에 아직 안 풀렸어요` : '가장 새 SDK 와 같아요',
+    ]);
+    ui.line();
+    ui.line('만들 때 이 명령을 쓰세요');
+    ui.line(`  npx create-expo-app@latest . --template blank-typescript@sdk-${r.sdk}`);
+    if (r.behind > 0) {
+      ui.line();
+      ui.line(`⚠️ @latest 로 만들면 SDK ${r.latestSdk} 가 되어 폰에서 열리지 않아요`);
+    }
+    ui.next('wait', '이 버전으로 만들게요');
+    return ui.flush(), 0;
+  }
+
+  if (sub === 'status') {
+    const [r, alive] = await Promise.all([expo.recommend(), expo.devServerAlive()]);
+    const mine = expo.projectSdk(root);
+
+    ui.header('앱 상태 점검');
+    ui.item(alive.alive ? '✅' : '❌', `개발 서버  ${alive.alive ? '켜져 있음' : '꺼져 있음'}`);
+    ui.item(mine ? '✅' : '⬜', `만든 앱    ${mine ? `SDK ${mine}` : '아직 안 만듦'}`);
+    if (r.ok) ui.item('✅', `폰에 깔림  SDK ${r.sdk} (Expo Go ${r.store.version})`);
+    else ui.item('⚠️', '폰에 깔림  확인 못 함 (인터넷)');
+
+    const mismatch = r.ok && mine && mine !== r.sdk;
+    if (mismatch) {
+      ui.line();
+      ui.line(`⚠️ 버전이 안 맞아요. 만든 앱은 SDK ${mine}, 폰은 SDK ${r.sdk} 까지만 열려요.`);
+      ui.line(`   폰이 아니라 만든 앱을 SDK ${r.sdk} 로 맞춰야 해요.`);
+    }
+    if (!alive.alive) {
+      ui.line();
+      ui.line('개발 서버가 꺼져 있어요. 켜기 전에는 폰에서 열리지 않아요.');
+    }
+
+    ui.next(mismatch || !alive.alive ? 'wait' : 'go',
+      mismatch || !alive.alive ? '고치고 다시 안내할게요' : '폰에서 열어보세요');
+    ui.flush();
+    return mismatch || !alive.alive ? 1 : 0;
+  }
+
+  ui.fail(`'expo ${sub}'는 없는 명령이에요.`, 'check | status');
+  return 1;
+}
+
 function main() {
   const { rest, opts } = parse(argv);
   const [cmd, sub, ...args] = rest;
 
   if (!cmd || opts.help || cmd === 'help') return help();
+
+  // 프로젝트가 없어도 만들기 전 확인은 가능해야 한다
+  if (cmd === 'expo') {
+    return expoCommand(sub, P.findRoot() || process.cwd())
+      .then((code) => process.exit(code))
+      .catch((e) => ui.fail('버전을 확인하지 못했어요.', e.message));
+  }
 
   if (cmd === 'init') {
     const root = process.cwd();
