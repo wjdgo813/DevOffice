@@ -185,6 +185,8 @@ BaaS를 쓰면 `infra` 는 영원히 안 켜지고, 웹만 만들면 `frontend` 
 | H1 | 웹/앱 3지선다 + 백엔드 판정 + 스택 잠금 | ✅ | G1 | `skills/devoffice-architect/` |
 | H2 | 도구·계정 안내 + `accounts.md` | ✅ | G3 | `skills/devoffice-setup/` |
 | H3 | 스캐폴딩 — **덧씌우기 방식** | ✅ | H1 | `lib/project.js`, `templates/scaffold/web-next/` |
+| H5 | **`mobile-expo` 서식** — 실사용 검증 중 발견 | ✅ | H3 | `templates/scaffold/mobile-expo/` |
+| H6 | **앱 비용 안내 수정** — Xcode 유무로 분기 | ✅ | H1 | `skills/devoffice-architect/`, `devoffice-skeleton/` |
 | H4 | 배포 + 첫 화면 | ✅ | H3 | `skills/devoffice-skeleton/` |
 
 **v0.1 완료 조건:** 비개발자가 대화만으로 **배포된 첫 화면**을 갖는다 ✅ (실사용 검증 남음)
