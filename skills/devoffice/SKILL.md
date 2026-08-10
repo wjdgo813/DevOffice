@@ -35,7 +35,8 @@ devoffice state show
 | `DESIGN` | `devoffice-architect` 스킬 |
 | `SETUP` | `devoffice-setup` 스킬 |
 | `SKELETON` | `devoffice-skeleton` 스킬 |
-| `BACKLOG` 이후 | 아래 §이어서 하기 |
+| `BACKLOG` | `devoffice-backlog` 스킬 — 목록과 순서 |
+| `FEATURE_LOOP` | 기능 시작 전이면 `devoffice-spec`(구체화), 진행 중이면 아래 §이어서 하기 |
 
 ---
 
@@ -298,7 +299,7 @@ devoffice journal add <종류> <내용>
 ## 기능 하나의 흐름
 
 ```
-① 명세      spec.md 작성 → gate spec → 사용자 승인
+① 구체화    devoffice-spec — 화면을 함께 그린다 → gate spec → 사용자 승인
 ② 계약      cto 호출 → contracts + plan.md → gate plan
 ③ 구현      backend ∥ frontend (계약이 잠긴 뒤에만)
 ④ 통합      cto 리뷰 → gate 통과

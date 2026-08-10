@@ -200,6 +200,28 @@ BaaS를 쓰면 `infra` 는 영원히 안 켜지고, 웹만 만들면 `frontend` 
 
 ---
 
+## Phase I — v0.2 기능 루프
+
+| ID | 작업 | 상태 | 결과물 |
+|---|---|---|---|
+| I1 | **`devoffice-backlog`** — 목록·순서·타당성 3색 | ✅ | `skills/devoffice-backlog/` |
+| I2 | **`devoffice-spec`** — 화면을 함께 그린다 | ✅ | `skills/devoffice-spec/` |
+| I3 | `research` 모드 B — 도메인 관행 조사 | ✅ | `agents/research.md` |
+| I4 | `backend` 에이전트 | ⬜ | `agents/backend.md` |
+| I5 | `frontend` 에이전트 | ⬜ | `agents/frontend.md` |
+| I6 | `qa` 에이전트 (읽기 전용) | ⬜ | `agents/qa.md` |
+| I7 | `devoffice-feature` — ②~⑦ 진행 | ⬜ | `skills/devoffice-feature/` |
+| I8 | L0 보안 게이트 | ⬜ | `lib/gate.js` |
+| I9 | 계약 규약 (`packages/contracts/`) | ⬜ | `templates/` |
+
+**시나리오:** [docs/feature-flow.md](./docs/feature-flow.md)
+
+> **I2가 v0.2의 핵심이다.** 원래 설계의 명세 단계는 "빠진 빈칸을 채우는" 방식이었는데,
+> 비개발자는 **"어떻게 보일지"를 상상하지 못한다.** 가정하면 틀리고, 물으면 "모르겠다"가 온다.
+> 그래서 **리서치로 실제 사례를 찾아와 스케치와 함께 고르게 한다.**
+
+---
+
 ## 작업 일지
 
 | 날짜 | 작업 | 메모 |
