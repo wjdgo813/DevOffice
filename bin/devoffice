@@ -50,6 +50,7 @@ function help() {
     'feature show             진행 중인 기능',
     'feature pass <게이트>    게이트 통과 기록',
     'feature verify           사용자 확인 완료 → 잠금 해제',
+    'feature cancel           진행 중인 기능 접기 (나중에 다시)',
     'feature complete         배포까지 끝. 다음으로',
     '',
     'task add <ID> --owner <담당> --title <내용>',
@@ -202,11 +203,12 @@ function main() {
         return ui.json(feature.pass(root, args[0]));
       }
       if (sub === 'verify') return feature.verify(root);
+      if (sub === 'cancel') return feature.cancel(root, opts.reason);
       if (sub === 'complete') {
         feature.complete(root);
         return state.summary(root);
       }
-      return ui.fail(`'feature ${sub}'는 없는 명령이에요.`, 'start | show | pass | verify | complete');
+      return ui.fail(`'feature ${sub}'는 없는 명령이에요.`, 'start | show | pass | verify | cancel | complete');
     }
 
     case 'task': {
