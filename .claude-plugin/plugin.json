@@ -2,13 +2,18 @@
   "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
   "name": "devoffice",
   "displayName": "DevOffice",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "비개발자가 대화만으로 웹·앱 프로덕트를 만드는 개발 조직 플러그인",
   "author": {
     "name": "DevOffice"
   },
   "license": "MIT",
-  "keywords": ["non-developer", "product", "orchestration", "korean"],
+  "keywords": [
+    "non-developer",
+    "product",
+    "orchestration",
+    "korean"
+  ],
   "userConfig": {
     "language": {
       "type": "string",
