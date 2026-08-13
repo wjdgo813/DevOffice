@@ -38,6 +38,9 @@ devoffice state show
 | `BACKLOG` | `devoffice-backlog` 스킬 — 목록과 순서 |
 | `FEATURE_LOOP` | 기능 시작 전이면 `devoffice-spec`(구체화), 진행 중이면 아래 §이어서 하기 |
 
+**사용자가 이미 정했거나 만든 걸 바꾸고 싶어하면** — 단계와 무관하게 `devoffice-change` 스킬.
+("이거 바꿔주세요" / "이것도 넣어주세요" / "빼주세요" / "이게 안 돼요")
+
 ---
 
 ## 처음 시작 (제품이 아직 없을 때)

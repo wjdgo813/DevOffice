@@ -19,6 +19,7 @@ const gate = require('../lib/gate');
 const doctor = require('../lib/doctor');
 const project = require('../lib/project');
 const expo = require('../lib/expo');
+const impact = require('../lib/impact');
 
 const argv = process.argv.slice(2);
 
@@ -51,6 +52,8 @@ function help() {
     'feature pass <게이트>    게이트 통과 기록',
     'feature verify           사용자 확인 완료 → 잠금 해제',
     'feature cancel           진행 중인 기능 접기 (나중에 다시)',
+    'feature impact <ID>      바꾸기 전 — 상태와 영향 범위',
+    'feature reopen <ID>      만들어진 기능을 수정하러 다시 열기',
     'feature complete         배포까지 끝. 다음으로',
     '',
     'task add <ID> --owner <담당> --title <내용>',
@@ -204,11 +207,45 @@ function main() {
       }
       if (sub === 'verify') return feature.verify(root);
       if (sub === 'cancel') return feature.cancel(root, opts.reason);
+      if (sub === 'impact') {
+        if (!args[0]) ui.fail('어떤 기능인지 알려주세요.', '예: feature impact F-003');
+        const r = impact.analyze(root, args[0]);
+
+        ui.header(r.row ? r.row.title : args[0], r.status);
+        if (!r.row) {
+          ui.line('목록에 없는 기능이에요.');
+          ui.next('turn', '기능 번호를 확인해주세요');
+          return ui.flush();
+        }
+        ui.lines([`되돌리기   ${r.reversible}`, `예상 시간   ${r.cost}`]);
+
+        if (r.dependents.length) {
+          ui.line();
+          ui.line('이것도 같이 바뀌어요');
+          r.dependents.forEach((d) => ui.line(` · ${d.title}`));
+        }
+        if (r.contract) {
+          ui.line();
+          ui.line('약속(계약)이 걸려 있어요 — 서버와 화면 양쪽을 같이 고쳐야 해요');
+        }
+        if (r.live && r.status === impact.STATE.BUILT) {
+          ui.line();
+          ui.line('⚠️ 실제로 쓰이는 중이에요');
+          ui.line('   저장된 데이터를 어떻게 할지 사용자에게 반드시 물어야 해요');
+        }
+        ui.next('turn', '이대로 바꿀지 사용자에게 확인받으세요');
+        return ui.flush();
+      }
+      if (sub === 'reopen') {
+        if (!args[0]) ui.fail('어떤 기능인지 알려주세요.', '예: feature reopen F-003');
+        feature.reopen(root, args[0], opts.reason);
+        return;
+      }
       if (sub === 'complete') {
         feature.complete(root);
         return state.summary(root);
       }
-      return ui.fail(`'feature ${sub}'는 없는 명령이에요.`, 'start | show | pass | verify | cancel | complete');
+      return ui.fail(`'feature ${sub}'는 없는 명령이에요.`, 'start | show | pass | verify | cancel | complete | impact | reopen');
     }
 
     case 'task': {
