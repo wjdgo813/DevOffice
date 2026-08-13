@@ -208,12 +208,12 @@ BaaS를 쓰면 `infra` 는 영원히 안 켜지고, 웹만 만들면 `frontend` 
 | I2 | **`devoffice-spec`** — 화면을 함께 그린다 | ✅ | `skills/devoffice-spec/` |
 | I3 | `research` 모드 B — 도메인 관행 조사 | ✅ | `agents/research.md` |
 | **I3-b** | **기능 수정** — 상태 판정·영향 범위·데이터 처리 | ✅ | `CHANGE.md`, `lib/impact.js`, `skills/devoffice-change/` |
-| I4 | `backend` 에이전트 | ⬜ | `agents/backend.md` |
-| I5 | `frontend` 에이전트 | ⬜ | `agents/frontend.md` |
-| I6 | `qa` 에이전트 (읽기 전용) | ⬜ | `agents/qa.md` |
-| I7 | `devoffice-feature` — ②~⑦ 진행 | ⬜ | `skills/devoffice-feature/` |
-| I8 | L0 보안 게이트 | ⬜ | `lib/gate.js` |
-| I9 | 계약 규약 (`packages/contracts/`) | ⬜ | `templates/` |
+| I4 | `backend` 에이전트 | ✅ | `agents/backend.md` |
+| I5 | `frontend` 에이전트 | ✅ | `agents/frontend.md` |
+| I6 | `qa` 에이전트 (읽기 전용) | ✅ | `agents/qa.md` |
+| I7 | `devoffice-feature` — ②~⑦ 진행 | ✅ | `skills/devoffice-feature/` |
+| I8 | L0 보안 게이트 | ✅ | `lib/gate.js` (`gate security`) |
+| I9 | 계약 규약 | ✅ | `skills/_shared/contracts.md` |
 
 **시나리오:** [docs/feature-flow.md](./docs/feature-flow.md)
 

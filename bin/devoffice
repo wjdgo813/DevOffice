@@ -64,6 +64,7 @@ function help() {
     'task list',
     '',
     'backlog list             만들 기능 목록 (정확한 현재 상태)',
+    'gate security            L0 — 되돌릴 수 없는 것 (가장 먼저)',
     'gate spec                명세가 규격에 맞는지',
     'gate plan                계획·준비물이 갖춰졌는지',
     'gate verify              확인 안내에 기대 결과가 있는지',
