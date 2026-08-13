@@ -223,6 +223,43 @@ BaaS를 쓰면 `infra` 는 영원히 안 켜지고, 웹만 만들면 `frontend` 
 
 ---
 
+## 개발 중 운영 메모
+
+**고친 걸 사용자에게 전달하려면 두 가지가 필요하다.**
+
+1. **버전을 올린다.** `plugin.json` 의 `version` 은 핀이라 안 올리면 `update` 가 거부된다
+2. **세션에 반영한다** — 아래 중 하나
+
+```bash
+# 터미널에서
+claude plugin marketplace update devoffice
+claude plugin update devoffice@devoffice
+```
+
+```
+# 세션 안에서 (재시작 없이)
+/reload-plugins
+```
+
+**반영됐는지 확인:**
+
+```bash
+devoffice version      # 방금 올린 버전이 나오면 성공
+```
+
+| 무엇이 | `/reload-plugins` | 재시작 |
+|---|---|---|
+| 스킬 (`SKILL.md`) | ✅ | ✅ |
+| 에이전트 | ✅ | ✅ |
+| 훅 | ✅ (새 경로로 전환) | ✅ |
+| **`bin/` 실행 파일** | **확인 필요** — 문서에 명시 없음 | ✅ |
+| 모니터 | ❌ | ✅ |
+
+> `bin/` 은 문서가 `/reload-plugins` 대상으로 언급하지 않는다.
+> **`devoffice version` 으로 확인하고, 옛 버전이 나오면 재시작한다.**
+
+---
+
 ## 작업 일지
 
 | 날짜 | 작업 | 메모 |
