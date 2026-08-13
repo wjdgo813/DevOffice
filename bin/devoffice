@@ -63,6 +63,7 @@ function help() {
     'task resolve <B-001>',
     'task list',
     '',
+    'backlog list             만들 기능 목록 (정확한 현재 상태)',
     'gate spec                명세가 규격에 맞는지',
     'gate plan                계획·준비물이 갖춰졌는지',
     'gate verify              확인 안내에 기대 결과가 있는지',
@@ -238,6 +239,11 @@ function main() {
           ui.line();
           ui.line('이것도 같이 바뀌어요');
           r.dependents.forEach((d) => ui.line(` · ${d.title}`));
+        } else if (r.depsUnknown) {
+          ui.line();
+          ui.line('⚠️ 무엇이 같이 바뀌는지 모르는 상태예요');
+          ui.line('   기능들 사이의 연결이 기록돼 있지 않아요.');
+          ui.line('   "영향 없음"이 아니라 "확인 못 함"입니다 — 직접 살펴보세요.');
         }
         if (r.contract) {
           ui.line();
@@ -261,6 +267,32 @@ function main() {
         return state.summary(root);
       }
       return ui.fail(`'feature ${sub}'는 없는 명령이에요.`, 'start | show | pass | verify | cancel | complete | impact | reopen');
+    }
+
+    case 'backlog': {
+      if (sub && sub !== 'list') ui.fail(`'backlog ${sub}'는 없는 명령이에요.`, 'list');
+      const b = impact.list(root);
+      if (!b.rows.length) {
+        ui.header('만들 기능 목록');
+        ui.line('아직 정해진 게 없어요.');
+        ui.next('turn', '무엇부터 만들지 정해볼까요?');
+        return ui.flush();
+      }
+      const done = b.rows.filter((r) => r.status === 'done').length;
+      ui.header('만들 기능 목록', `${done}/${b.rows.length}`);
+      const MARK = { done: '✅', in_progress: '🔄', pending: '⬜' };
+      b.rows.forEach((r) => {
+        const dep = (r.dependsOn || []).length ? `  ←${r.dependsOn.join(',')}` : '';
+        const spec = r.spec ? ' ·정해짐' : '';
+        ui.item(MARK[r.status] || '⬜', `${r.id}  ${r.title}${spec}${dep}`);
+      });
+      if (!b.depsRecorded && b.rows.length > 1) {
+        ui.line();
+        ui.line('⚠️ 기능들 사이의 연결이 기록돼 있지 않아요');
+        ui.line('   하나를 빼면 뭐가 같이 무너지는지 알 수 없어요.');
+      }
+      ui.next('turn', '바꾸실 게 있으면 말씀해주세요');
+      return ui.flush();
     }
 
     case 'task': {
