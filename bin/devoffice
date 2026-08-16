@@ -20,6 +20,7 @@ const doctor = require('../lib/doctor');
 const project = require('../lib/project');
 const expo = require('../lib/expo');
 const impact = require('../lib/impact');
+const status = require('../lib/status');
 
 const argv = process.argv.slice(2);
 
@@ -44,7 +45,8 @@ function help() {
   ui.lines([
     'version                  지금 쓰는 버전 (업데이트 확인용)',
     'init                     이 폴더에서 제품을 시작한다',
-    'state show               지금 어디까지 왔는지',
+    'status                   지금 뭐가 됐고 뭐가 남았는지 (한 화면)',
+    'state show               큰 단계 지도',
     'state get <경로>         값 하나 읽기',
     'state set <경로> <값>    값 하나 쓰기',
     '',
@@ -189,6 +191,8 @@ function main() {
   const root = P.requireRoot();
 
   switch (cmd) {
+    case 'status': return status.show(root);
+
     case 'state': {
       if (!sub || sub === 'show') return state.summary(root);
       if (sub === 'get') {

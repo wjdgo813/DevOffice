@@ -23,8 +23,13 @@ DevOffice는 비개발자에게 **개발 조직 하나를 붙여주는** 도구�
 불렸으면 가장 먼저 상태를 확인한다. **추측하지 않는다.**
 
 ```bash
-devoffice state show
+devoffice status        # 뭐가 됐고 뭐가 남았는지 (한 화면)
+devoffice state show    # 큰 단계 지도
 ```
+
+**사용자가 "지금 어디까지 했지?" / "뭐 남았지?" 라고 물으면
+`devoffice status` 출력을 그대로 보여준다.** 요약해서 다시 쓰지 마라 —
+그 순간 숫자를 지어내게 된다.
 
 | 상태 | 할 일 |
 |---|---|
@@ -284,7 +289,9 @@ PRD도 백로그도 **요약 3가지**로 확인받는다. 문서는 볼 수 있
 상태를 손으로 고치지 마라. 항상 명령을 쓴다. 형식이 깨지지 않는다.
 
 ```bash
-devoffice state show                    # 지금 어디까지
+devoffice status                        # 뭐가 됐고 뭐가 남았는지 ★
+devoffice state show                    # 큰 단계 지도
+devoffice backlog list                  # 기능 목록 전체
 devoffice state set <경로> <값>
 devoffice doctor                        # 준비물 점검
 
