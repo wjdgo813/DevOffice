@@ -21,6 +21,7 @@ const project = require('../lib/project');
 const expo = require('../lib/expo');
 const impact = require('../lib/impact');
 const status = require('../lib/status');
+const regression = require('../lib/regression');
 
 const argv = process.argv.slice(2);
 
@@ -70,6 +71,7 @@ function help() {
     'gate spec                명세가 규격에 맞는지',
     'gate plan                계획·준비물이 갖춰졌는지',
     'gate verify              확인 안내에 기대 결과가 있는지',
+    'gate regression          예전 기능이 아직 도는지 (L5)',
     'gate all                 위 전부',
     'doctor                   준비물 점검',
     'scaffold <프리셋>        첫 화면·설정 파일 덧씌우기',
@@ -324,6 +326,51 @@ function main() {
     }
 
     case 'gate': {
+      if (sub === 'regression') {
+        const s = state.load(root);
+        const titleOf = (id) => {
+          const row = (s.backlog || []).find((b) => b.id === id);
+          return row ? row.title : id;
+        };
+        const r = regression.run(root);
+
+        if (r.ok === null) {
+          ui.header('예전 기능 점검', '아직 없음');
+          ui.line('예전에 확인하신 기능들이 아직 도는지 자동으로 확인하는 장치가 없어요.');
+          ui.line();
+          ui.line('기능이 쌓이면 예전 게 조용히 깨져요.');
+          ui.line('5개를 넘기기 전에 넣어두는 게 좋아요.');
+          ui.next('turn', '지금 넣어둘까요?');
+          return ui.flush(), 0;   // 없는 것은 실패가 아니다
+        }
+
+        if (r.ok) {
+          const n = regression.testFiles(root).length;
+          ui.header('예전 기능 점검', '이상 없음');
+          ui.line(`확인해두신 기능들이 전부 그대로 돌아요.${n ? ` (${n}개 확인)` : ''}`);
+          const manual = regression.manualChecklist(root);
+          if (manual.length) {
+            ui.line();
+            ui.line('직접 봐주셔야 하는 것');
+            manual.forEach((m) => m.items.slice(0, 2).forEach((i) => ui.line(` · ${titleOf(m.id)} — ${i}`)));
+          }
+          ui.next('wait', '다음으로 갈 수 있어요');
+          return ui.flush(), 0;
+        }
+
+        ui.header('예전 기능이 깨졌어요', `${r.broken.length || '?'}건`);
+        if (r.broken.length) {
+          r.broken.forEach((id) => ui.item('❌', titleOf(id)));
+          ui.line();
+          ui.line('새로 만든 것 때문에 예전 게 안 되게 됐어요.');
+          ui.line('고치고 다시 확인해드릴게요.');
+        } else {
+          ui.line('점검이 실패했는데 어느 기능인지 알 수 없어요.');
+          ui.line('테스트 파일 이름에 기능 번호(F-003)를 넣어야 짚어낼 수 있어요.');
+        }
+        ui.next('wait', '고치는 중이에요');
+        return ui.flush(), 1;
+      }
       const which = sub || 'all';
       return process.exit(gate.run(root, which));
     }

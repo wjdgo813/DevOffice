@@ -223,6 +223,25 @@ BaaS를 쓰면 `infra` 는 영원히 안 켜지고, 웹만 만들면 `frontend` 
 
 ---
 
+## Phase J — v0.3
+
+| ID | 작업 | 상태 | 결과물 |
+|---|---|---|---|
+| J1 | `fixer` 에이전트 — 원인 확정 후 최소 수리 | ✅ | `agents/fixer.md` |
+| J2 | 회귀 규약 — 자동/수동 경계 | ✅ | `skills/_shared/regression.md` |
+| J3 | `gate regression` — 깨진 걸 **기능 이름으로** 되돌려준다 | ✅ | `lib/regression.js` |
+| J4 | `qa` 에 회귀 테스트 생성 역할 | ✅ | `agents/qa.md` §4-b |
+| J5 | 기능 루프에 ⑦회귀 단계 | ✅ | `skills/devoffice-feature/` |
+| J6 | `devoffice status` — 현 상태 한 화면 | ✅ | `lib/status.js` |
+
+**완료 조건:** 예전에 확인받은 기능이 깨지면 **우리가 먼저 안다** ✅
+
+> **모바일에서 Playwright 는 못 쓴다.** Expo 는 `jest-expo` + RNTL 로
+> 렌더·상호작용·상태를 실기기 없이 확인한다. 커버 못 하는 것(실기기 느낌,
+> 외부 API)은 `regression.md` 수동 체크리스트로 남긴다 — 없애지 않는다.
+
+---
+
 ## 개발 중 운영 메모
 
 **고친 걸 사용자에게 전달하려면 두 가지가 필요하다.**
