@@ -174,7 +174,49 @@ async function judgeCommand(kind, text, opts) {
     ui.next('turn', '지금은 그냥 진행하셔도 돼요');
     return ui.flush(), 0;
   }
-  if (!text) ui.fail('무엇을 판단할지 알려주세요.', '예: judge ambiguity "잔액 화면 좀 바꿔주세요"');
+  if (!text && kind !== 'testset') ui.fail('무엇을 판단할지 알려주세요.', '예: judge ambiguity "잔액 화면 좀 바꿔주세요"');
+
+  // 시험 세트 — 기대값과 나란히 비교한다
+  if (kind === 'testset') {
+    const which = (opts.only && [opts.only]) || Object.keys(jev.TESTSET);
+    let hit = 0, total = 0;
+    for (const set of which) {
+      ui.header(`시험 · ${set}`);
+      for (const [sentence, expect, why] of jev.TESTSET[set]) {
+        const qs = set === 'ambiguity' ? jev.AMBIGUITY
+          : set === 'feasibility' ? { feasibility: jev.FEASIBILITY }
+            : { kind: jev.CHANGE_KIND };
+        const r = await jev.evaluate(sentence, qs);
+        total += 1;
+        if (!r.ok) { ui.item('⚠️', `${sentence}  (${r.reason})`); continue; }
+
+        let got, ok;
+        if (set === 'ambiguity') {
+          const s = jev.strengthOf(r.answers);
+          got = `강도 ${s.strength}`;
+          ok = s.strength >= expect[0] && s.strength <= expect[1];
+        } else {
+          const a = Object.values(r.answers)[0];
+          got = `${a.choice} (${(a.confidence * 100).toFixed(0)}%)`;
+          ok = a.choice === expect;
+        }
+        if (ok) hit += 1;
+        const want = Array.isArray(expect) ? `강도 ${expect[0]}~${expect[1]}` : expect;
+        ui.item(ok ? '✅' : '❌', `${sentence}`);
+        ui.line(`    기대 ${want} · 실제 ${got}${ok ? '' : `  — ${why}`}`);
+      }
+      ui.line();
+    }
+    ui.rule();
+    ui.line(`  ${hit}/${total} 맞음`);
+    ui.line();
+    ui.line('  판단 기준');
+    ui.line('   · 거의 다 맞으면 → 붙일 가치가 있다');
+    ui.line('   · 절반쯤이면 → 지시문(criteria)을 다듬어 다시');
+    ui.line('   · 많이 틀리면 → 붙이지 않는다. 프롬프트가 낫다');
+    ui.flush();
+    return hit === total ? 0 : 1;
+  }
 
   const SETS = {
     ambiguity: jev.AMBIGUITY,
