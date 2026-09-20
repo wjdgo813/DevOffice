@@ -66,6 +66,10 @@ function help() {
     'task resolve <B-001>',
     'task list',
     '',
+    'prep set --link .. --seed .. --accounts ..   검증 준비물',
+    'evidence set AC-1 --proof "파일:줄"          근거 대조 (L3)',
+    'evidence list',
+    '',
     'backlog list             만들 기능 목록 (정확한 현재 상태)',
     'gate security            L0 — 되돌릴 수 없는 것 (가장 먼저)',
     'gate spec                명세가 규격에 맞는지',
@@ -275,6 +279,60 @@ function main() {
         return state.summary(root);
       }
       return ui.fail(`'feature ${sub}'는 없는 명령이에요.`, 'start | show | pass | verify | cancel | complete | impact | reopen');
+    }
+
+    case 'prep': {
+      if (sub !== 'set' && sub) ui.fail(`'prep ${sub}'는 없는 명령이에요.`, 'set');
+      const r = state.update(root, (s) => {
+        const cf = s.currentFeature;
+        if (!cf) ui.fail('진행 중인 기능이 없어요.');
+        cf.prep = cf.prep || { accounts: [], seed: null, deeplink: null, note: null };
+        if (opts.link) cf.prep.deeplink = opts.link;
+        if (opts.seed) cf.prep.seed = opts.seed;
+        if (opts.note) cf.prep.note = opts.note;
+        if (opts.accounts) {
+          cf.prep.accounts = opts.accounts === 'none'
+            ? 'none' : String(opts.accounts).split(',').map((x) => x.trim());
+        }
+        return cf.prep;
+      });
+      journal.add(root, 'prep.set', '검증 준비물');
+      return ui.json(r);
+    }
+
+    case 'evidence': {
+      const cfId = () => {
+        const s = state.load(root);
+        if (!s.currentFeature) ui.fail('진행 중인 기능이 없어요.');
+        return s.currentFeature;
+      };
+      if (sub === 'set') {
+        if (!args[0]) ui.fail('어떤 인수 조건인지 알려주세요.', '예: evidence set AC-1 --proof "app/list.tsx:12"');
+        const ok = !opts.fail;
+        if (ok && !opts.proof) {
+          ui.fail('근거가 필요해요.',
+            '"잘 됩니다"는 근거가 아니에요. --proof "파일:줄" 로 어디에 만들었는지 적어주세요.');
+        }
+        const r = state.update(root, (s) => {
+          const cf = s.currentFeature;
+          cf.evidence = (cf.evidence || []).filter((e) => e.ac !== args[0]);
+          cf.evidence.push({ ac: args[0], ok, proof: opts.proof || '', note: opts.note || '' });
+          cf.evidence.sort((a, b) => a.ac.localeCompare(b.ac));
+          return cf.evidence.find((e) => e.ac === args[0]);
+        });
+        journal.add(root, 'evidence.set', `${args[0]} ${ok ? 'ok' : 'fail'}`);
+        return ui.json(r);
+      }
+      if (!sub || sub === 'list') {
+        const cf = cfId();
+        const rows = cf.evidence || [];
+        ui.header('근거 대조', `${rows.filter((e) => e.ok).length}/${rows.length}`);
+        if (!rows.length) ui.line('아직 대조한 게 없어요.');
+        rows.forEach((e) => ui.item(e.ok ? '✅' : '❌', `${e.ac}  ${e.proof || e.note || '근거 없음'}`));
+        ui.next('wait', rows.some((e) => !e.ok) ? '고쳐야 할 게 있어요' : '다음으로 갈 수 있어요');
+        return ui.flush();
+      }
+      return ui.fail(`'evidence ${sub}'는 없는 명령이에요.`, 'set | list');
     }
 
     case 'backlog': {

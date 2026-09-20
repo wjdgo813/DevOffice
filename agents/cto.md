@@ -41,7 +41,17 @@ packages/contracts/F-003.ts     ← 당신만 쓴다
 
 ## 2. 계획 — `plan.md`
 
-`devoffice feature start` 가 만들어둔 서식을 채운다. 네 가지가 핵심이다.
+**작업·담당·AC매핑·준비물은 `plan.md` 에 적지 않는다. 명령으로 기록한다.**
+같은 걸 문서와 상태 양쪽에 두면 어긋나고, 그때 어느 쪽이 맞는지 알 수 없다.
+
+```bash
+devoffice task add T1 --owner backend --title "목록 API" --ac AC-1
+devoffice prep set --link "/items" --seed "예시 5개(긴 이름 1개 포함)" --accounts none
+```
+
+`plan.md` 에는 **구조가 없는 것만** 적는다 — 재사용 조사, 설계 판단, 확인 필요.
+
+네 가지가 핵심이다.
 
 ### ① 작업 배정 — 담당 없는 작업은 없다
 
@@ -103,7 +113,15 @@ packages/contracts/F-003.ts     ← 당신만 쓴다
 
 **"잘 된 것 같다"라고 쓸 수 없다.** AC마다 **파일:라인 근거**를 댄다.
 
-`.devoffice/features/<ID>/verification.md`:
+**근거도 명령으로 기록한다.** 근거 없이는 등록조차 안 된다.
+
+```bash
+devoffice evidence set AC-1 --proof "server/routes/items.ts:14"
+devoffice evidence set AC-4 --fail --note "빈 상태 문구가 없음"
+devoffice evidence list
+```
+
+기록하면 이렇게 보인다:
 
 ```markdown
 | AC | 판정 | 근거 |

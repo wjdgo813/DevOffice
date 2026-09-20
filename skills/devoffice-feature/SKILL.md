@@ -47,8 +47,9 @@ devoffice gate spec         # 명세가 규격에 맞는지
 | 산출물 | 무엇 |
 |---|---|
 | `packages/contracts/<ID>.ts` | 주고받는 것의 모양. **CTO 만 쓴다** |
-| `plan.md` 의 작업표 | 담당·완료조건·관련 AC |
-| `plan.md` 의 준비물 | 테스트 계정·시드·직링크 |
+| `devoffice task add` | 작업·담당·관련 AC — **문서가 아니라 명령으로** |
+| `devoffice prep set` | 테스트 계정·시드·직링크 |
+| `plan.md` | 구조가 없는 것만 (재사용 조사·설계 판단·확인 필요) |
 
 ```bash
 devoffice gate plan
@@ -112,13 +113,15 @@ devoffice gate l2           # 계약대로 응답하는지
 
 **L0 이 막으면 다른 걸 보기 전에 고친다.** 권한·비밀키는 사고가 나면 되돌릴 수 없다.
 
-그다음 CTO 에게 **증거 대조**를 맡긴다.
+그다음 CTO 에게 **증거 대조**를 맡긴다. 이것도 명령으로 기록한다.
 
+```bash
+devoffice evidence set AC-1 --proof "server/routes/strategies.ts:14"
+devoffice evidence set AC-4 --fail --note "빈 상태 문구가 없음"
+devoffice gate evidence
 ```
-| AC   | 판정 | 근거                          |
-| AC-1 | ✅  | server/routes/strategies.ts:14 |
-| AC-4 | ❌  | 근거 없음 — 빈 상태 문구가 없음  |
-```
+
+**근거 없이는 등록이 거부된다** — "잘 됩니다"라고 쓸 방법이 없다.
 
 **근거를 못 대면 미구현으로 간주한다.** ❌ 가 하나라도 있으면
 사용자에게 가지 않는다. 고치고 다시 대조한다.
