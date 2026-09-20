@@ -45,6 +45,7 @@ packages/contracts/F-003.ts     ← 당신만 쓴다
 같은 걸 문서와 상태 양쪽에 두면 어긋나고, 그때 어느 쪽이 맞는지 알 수 없다.
 
 ```bash
+devoffice ac list                    # 무엇을 확인할지 (명세 단계에서 등록됨)
 devoffice task add T1 --owner backend --title "목록 API" --ac AC-1
 devoffice prep set --link "/items" --seed "예시 5개(긴 이름 1개 포함)" --accounts none
 ```

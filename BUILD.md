@@ -269,10 +269,11 @@ BaaS를 쓰면 `infra` 는 영원히 안 켜지고, 웹만 만들면 `frontend` 
 
 | 산출물 | 누가 읽나 | 형식 | 이유 |
 |---|---|---|---|
+| **인수 조건(AC)** | 기계 | **state.json** | `ac add` — 사용자에게 안 보이는 내부 산출물 |
 | 작업·담당·AC매핑 | 기계 | **state.json** | `task add` 로만 기록. 중복 금지 |
 | 검증 준비물 | 기계 | **state.json** | `prep set` |
 | 근거 대조 | 기계 | **state.json** | `evidence set` — 근거 없으면 등록 거부 |
-| `spec.md` | **사용자**(승인) + 기계 | md | 사용자가 읽고 승인한다 |
+| `spec.md` | **사용자**(승인) | md | 가정 명세·만드는 것·안 만드는 것. **AC 는 빠졌다** |
 | `verify.md` | **사용자**(확인) | md | 사용자가 보고 따라 한다 |
 | `plan.md` | LLM | md | 구조 없는 것만 — 재사용 조사·설계 판단 |
 | `handoff/` `worklog/` `blockers/` | LLM | md | **LLM 은 마크다운을 더 잘 읽는다** |

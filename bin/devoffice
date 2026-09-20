@@ -68,6 +68,8 @@ function help() {
     'task resolve <B-001>',
     'task list',
     '',
+    'ac add "<문장>"          인수 조건 등록 (최대 5개)',
+    'ac list',
     'prep set --link .. --seed .. --accounts ..   검증 준비물',
     'evidence set AC-1 --proof "파일:줄"          근거 대조 (L3)',
     'evidence list',
@@ -395,6 +397,50 @@ function main() {
       return ui.fail(`'feature ${sub}'는 없는 명령이에요.`, 'start | show | pass | verify | cancel | complete | impact | reopen');
     }
 
+    case 'ac': {
+      const cur = () => {
+        const s = state.load(root);
+        if (!s.currentFeature) ui.fail('진행 중인 기능이 없어요.');
+        return s.currentFeature;
+      };
+      if (sub === 'add') {
+        const text = args.join(' ');
+        if (!text) ui.fail('인수 조건 문장이 필요해요.',
+          '예: ac add "로그인한 사람만 댓글을 쓸 수 있다"');
+        const r = state.update(root, (s) => {
+          const cf = s.currentFeature;
+          cf.acceptance = cf.acceptance || [];
+          const { LIMITS } = require('../lib/schema');
+          if (cf.acceptance.length >= LIMITS.acPerFeature) {
+            ui.fail(
+              `인수 조건이 ${LIMITS.acPerFeature}개를 넘었어요. 기능이 너무 큽니다.`,
+              '기능을 나눠서 하나씩 확인받는 편이 안전해요.\n' +
+              '              사용자에게 나눠도 될지 여쭤보세요.'
+            );
+          }
+          const id = `AC-${cf.acceptance.length + 1}`;
+          cf.acceptance.push({ id, text });
+          return { id, text };
+        });
+        journal.add(root, 'ac.add', `${r.id} ${r.text}`);
+        return ui.json(r);
+      }
+      if (sub === 'clear') {
+        state.update(root, (s) => { s.currentFeature.acceptance = []; });
+        return ui.json({ cleared: true });
+      }
+      if (!sub || sub === 'list') {
+        const cf = cur();
+        const rows = cf.acceptance || [];
+        ui.header('인수 조건', `${rows.length}개`);
+        if (!rows.length) ui.line('아직 없어요.');
+        rows.forEach((a) => ui.line(`${a.id}  ${a.text}`));
+        ui.next('wait', rows.length ? '이걸로 검증해요' : '무엇을 확인할지 정해야 해요');
+        return ui.flush();
+      }
+      return ui.fail(`'ac ${sub}'는 없는 명령이에요.`, 'add | list | clear');
+    }
+
     case 'prep': {
       if (sub !== 'set' && sub) ui.fail(`'prep ${sub}'는 없는 명령이에요.`, 'set');
       const r = state.update(root, (s) => {
@@ -442,7 +488,11 @@ function main() {
         const rows = cf.evidence || [];
         ui.header('근거 대조', `${rows.filter((e) => e.ok).length}/${rows.length}`);
         if (!rows.length) ui.line('아직 대조한 게 없어요.');
-        rows.forEach((e) => ui.item(e.ok ? '✅' : '❌', `${e.ac}  ${e.proof || e.note || '근거 없음'}`));
+        const acText = new Map((cf.acceptance || []).map((a) => [a.id, a.text]));
+        rows.forEach((e) => {
+          ui.item(e.ok ? '✅' : '❌', `${e.ac}  ${acText.get(e.ac) || ''}`);
+          ui.line(`      ${e.proof || e.note || '근거 없음'}`);
+        });
         ui.next('wait', rows.some((e) => !e.ok) ? '고쳐야 할 게 있어요' : '다음으로 갈 수 있어요');
         return ui.flush();
       }
