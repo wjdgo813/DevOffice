@@ -73,6 +73,34 @@ function checkBash(input, root, state) {
   }
 }
 
+/**
+ * 계약 파일은 CTO 만 쓴다 (PROTOCOL §P3 / contracts.md).
+ *
+ * 이게 프롬프트에만 있으면 언젠가 어겨진다. 그리고 어긴 순간
+ * 계약이 계약이 아니게 된다 — 서버와 화면이 각자 고치면 다시 갈라진다.
+ *
+ * PreToolUse 가 agent_type 을 주므로 기계적으로 막을 수 있다.
+ */
+const CONTRACT_WRITERS = new Set(['cto', 'fixer']);
+
+function checkContractOwnership(input, root) {
+  const file = (input.tool_input && (input.tool_input.file_path || input.tool_input.path)) || '';
+  if (!file) return;
+  const rel = path.relative(root, path.resolve(file));
+  if (!/^packages[/\\]contracts[/\\]/.test(rel)) return;
+
+  const who = input.agent_type;
+  if (!who) return;                      // 메인 세션(프로듀서)은 관여하지 않는다
+  if (CONTRACT_WRITERS.has(who)) return;
+
+  H.deny(
+    `약속(계약) 파일은 기술 총괄만 고칠 수 있습니다: ${rel}\n` +
+    '서버와 화면이 각자 고치면 약속이 다시 갈라집니다.\n' +
+    '계약이 잘못됐다고 판단되면 고치지 말고 블로커를 남기세요 ' +
+    '(devoffice task block <ID> --type SPEC_WRONG).'
+  );
+}
+
 function checkWrite(input, root) {
   const file = (input.tool_input && (input.tool_input.file_path || input.tool_input.path)) || '';
   if (!file) return;
@@ -112,6 +140,7 @@ H.safely((input) => {
   const tool = input.tool_name;
   if (tool === 'Bash' || tool === 'PowerShell') return checkBash(input, root, state);
   if (tool === 'Write' || tool === 'Edit' || tool === 'NotebookEdit') {
+    checkContractOwnership(input, root);   // 막으면 여기서 종료된다
     return checkWrite(input, root);
   }
 });
