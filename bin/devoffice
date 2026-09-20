@@ -22,6 +22,7 @@ const expo = require('../lib/expo');
 const impact = require('../lib/impact');
 const status = require('../lib/status');
 const regression = require('../lib/regression');
+const jev = require('../lib/jev');
 
 const argv = process.argv.slice(2);
 
@@ -45,6 +46,7 @@ function help() {
   ui.header('DevOffice');
   ui.lines([
     'version                  지금 쓰는 버전 (업데이트 확인용)',
+    'judge <종류> "<문장>"     판단 보조 시험 (ambiguity|feasibility|change)',
     'init                     이 폴더에서 제품을 시작한다',
     'status                   지금 뭐가 됐고 뭐가 남았는지 (한 화면)',
     'state show               큰 단계 지도',
@@ -156,6 +158,69 @@ async function expoCommand(sub, root) {
   return 1;
 }
 
+/**
+ * Jev 로 판단을 받아본다. 키가 없으면 "쓸 수 없다"고만 말하고 끝낸다 —
+ * 없다고 제품이 멈추지 않는다.
+ */
+async function judgeCommand(kind, text, opts) {
+  if (!jev.available()) {
+    ui.header('판단 보조', '꺼져 있음');
+    ui.lines([
+      '지금은 제가 직접 판단하고 있어요. 그대로도 잘 돌아갑니다.',
+      '',
+      '더 정확한 판단을 붙이고 싶으시면 TYPESAFE_API_KEY 를 환경변수로 넣어주세요.',
+      '없어도 아무 문제 없어요 — 있으면 모호함·타당성 판정에 씁니다.',
+    ]);
+    ui.next('turn', '지금은 그냥 진행하셔도 돼요');
+    return ui.flush(), 0;
+  }
+  if (!text) ui.fail('무엇을 판단할지 알려주세요.', '예: judge ambiguity "잔액 화면 좀 바꿔주세요"');
+
+  const SETS = {
+    ambiguity: jev.AMBIGUITY,
+    feasibility: { feasibility: jev.FEASIBILITY },
+    change: { kind: jev.CHANGE_KIND },
+  };
+  const questions = SETS[kind || 'ambiguity'];
+  if (!questions) ui.fail(`'${kind}'는 없는 판단이에요.`, 'ambiguity | feasibility | change');
+
+  const r = await jev.evaluate(text, questions);
+  if (!r.ok) {
+    ui.header('판단 보조', '실패');
+    ui.line(`받아오지 못했어요 (${r.reason}).`);
+    ui.line('제가 직접 판단해서 계속 진행할게요.');
+    ui.next('wait', '그대로 진행합니다');
+    return ui.flush(), 0;     // 실패가 제품을 막지 않는다
+  }
+
+  if (opts.json) return ui.json(r), 0;
+
+  ui.header(`판단 · ${kind || 'ambiguity'}`, r.model);
+  Object.entries(r.answers).forEach(([k, a]) => {
+    if (a.type === 'score') {
+      const lv = a.legend ? a.legend[String(Math.round(a.score))] : '';
+      ui.line(`${k}  ${a.score.toFixed(2)}  ${lv}  (확신 ${(a.confidence * 100).toFixed(0)}%)`);
+    } else if (a.type === 'choice') {
+      ui.line(`${k}  ${a.choice}  (확신 ${(a.confidence * 100).toFixed(0)}%)`);
+    } else {
+      ui.line(`${k}  ${(a.noul * 100).toFixed(0)}%`);
+    }
+  });
+
+  // 모호함이면 두 축을 곱해 강도를 낸다 (DIALOGUE §5.2)
+  const f = r.answers.forks, g = r.answers.gap, rv = r.answers.reversible;
+  if (f && g) {
+    const m = (f.score / 2) * (g.score / 2);
+    const strength = m < 0.15 ? 0 : m < 0.35 ? 2 : (rv && rv.score >= 1.5) ? 4 : 3;
+    ui.line();
+    ui.line(`모호함 ${(m * 100).toFixed(0)}%  →  되묻기 강도 ${strength}`);
+    ui.line(['그냥 한다', '', '가정 통보 (응답 불필요)', '객관식 1개', '대화로 되돌아가기'][strength]);
+  }
+  if (r.usage) { ui.line(); ui.line(`토큰 ${r.usage.input_tokens}+${r.usage.output_tokens}`); }
+  ui.next('turn', '이 판정이 실제와 맞는지 봐주세요');
+  return ui.flush(), 0;
+}
+
 function main() {
   const { rest, opts } = parse(argv);
   const [cmd, sub, ...args] = rest;
@@ -175,6 +240,13 @@ function main() {
   }
 
   if (!cmd || opts.help || cmd === 'help') return help();
+
+  // 판단 보조(Jev). 프로젝트가 없어도 시험해볼 수 있어야 한다.
+  if (cmd === 'judge') {
+    return judgeCommand(sub, args.join(' ') || opts.text || '', opts)
+      .then((code) => process.exit(code))
+      .catch((e) => ui.fail('판단을 받아오지 못했어요.', e.message));
+  }
 
   // 프로젝트가 없어도 만들기 전 확인은 가능해야 한다
   if (cmd === 'expo') {
