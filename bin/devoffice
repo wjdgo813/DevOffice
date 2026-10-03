@@ -341,7 +341,8 @@ function main() {
         const { created } = scaffold.initFeature(root, f.id, f.title);
         ui.header(f.title, f.id);
         ui.line('시작했어요.');
-        if (created.length) ui.line(`서류철을 만들었어요 (${created.join(', ')})`);
+        if (f.restored) ui.line(`전에 접어둔 걸 되살렸어요 — 작업 ${f.restored.tasks}개`);
+        else if (created.length) ui.line(`서류철을 만들었어요 (${created.join(', ')})`);
         ui.next('wait', '만드는 중이에요');
         return ui.flush();
       }
