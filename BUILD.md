@@ -312,8 +312,9 @@ BaaS를 쓰면 `infra` 는 영원히 안 켜지고, 웹만 만들면 `frontend` 
 
 **고친 걸 사용자에게 전달하려면 두 가지가 필요하다.**
 
-1. **버전을 올린다.** `plugin.json` 의 `version` 은 핀이라 안 올리면 `update` 가 거부된다
-2. **세션에 반영한다** — 아래 중 하나
+1. **원본 버전을 올린다.** `plugin.source.json`의 `version`을 수정한다.
+2. **런타임 파일을 생성한다.** `node scripts/build-plugins.js`를 실행하고 `node scripts/build-plugins.js --check`가 통과하는지 확인한다.
+3. **세션에 반영한다.** Claude Code는 아래 명령을 사용한다. Codex는 플러그인 마켓플레이스에서 새 버전을 확인하고 다시 로드한다.
 
 ```bash
 # 터미널에서

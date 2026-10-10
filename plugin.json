@@ -1,0 +1,32 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "devoffice",
+  "version": "0.4.7",
+  "description": "비개발자가 대화만으로 웹·앱 프로덕트를 만드는 개발 조직 플러그인",
+  "author": {
+    "name": "DevOffice"
+  },
+  "license": "MIT",
+  "keywords": [
+    "non-developer",
+    "product",
+    "orchestration",
+    "korean"
+  ],
+  "skills": [
+    "./skills/",
+    "./codex/skills/"
+  ],
+  "extensions": {
+    "com.openai": {
+      "hooks": "./hooks/adapters/codex/hooks.json",
+      "interface": {
+        "displayName": "DevOffice",
+        "shortDescription": "비개발자가 대화만으로 웹·앱 프로덕트를 만드는 개발 조직 플러그인",
+        "longDescription": "비개발자가 대화만으로 웹·앱 프로덕트를 만드는 개발 조직 플러그인",
+        "developerName": "DevOffice",
+        "category": "Productivity"
+      }
+    }
+  }
+}

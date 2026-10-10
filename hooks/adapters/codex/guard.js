@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 'use strict';
 
-// Claude Code entry point. Policy decisions are shared with the Codex adapter.
+// Codex entry point. apply_patch requests are normalized by the shared policy.
 
-const H = require('./lib/hook');
-const policy = require('./lib/guard-policy');
+const H = require('../../lib/hook');
+const policy = require('../../lib/guard-policy');
 
 H.safely((input) => {
   const root = H.findProject(input.cwd);

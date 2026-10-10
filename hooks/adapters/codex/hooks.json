@@ -1,0 +1,55 @@
+{
+  "description": "DevOffice safety and workflow reminders for Codex",
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|resume|clear|compact",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${PLUGIN_ROOT}/hooks/adapters/codex/session-start.js\"",
+            "statusMessage": "Loading DevOffice CLI path",
+            "timeout": 3
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "^(Bash|apply_patch|Edit|Write)$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${PLUGIN_ROOT}/hooks/adapters/codex/guard.js\"",
+            "statusMessage": "Checking DevOffice safety rules",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "^Bash$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${PLUGIN_ROOT}/hooks/adapters/codex/translate-error.js\"",
+            "statusMessage": "Explaining the command result",
+            "timeout": 3
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${PLUGIN_ROOT}/hooks/adapters/codex/check-lock.js\"",
+            "timeout": 3
+          }
+        ]
+      }
+    ]
+  }
+}

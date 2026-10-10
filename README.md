@@ -1,6 +1,6 @@
 # DevOffice
 
-**비개발자가 대화만으로 웹·앱 제품을 만드는 Claude Code 플러그인.**
+**비개발자가 대화만으로 웹·앱 제품을 만드는 Claude Code·Codex 플러그인.**
 
 코드를 대신 써주는 도구가 아니라, **개발 조직 하나를 붙여주는** 도구입니다.
 기획자가 PRD를 쓰고, 기술 총괄이 설계하고, 개발자가 만들고, 확인을 받고 배포합니다.
@@ -18,6 +18,16 @@ Claude Code에서:
 /plugin marketplace add wjdgo813/DevOffice
 /plugin install devoffice@devoffice
 ```
+
+Codex에서 로컬 체크아웃을 마켓플레이스로 추가한 뒤 Plugins 화면에서 설치합니다:
+
+```bash
+codex plugin marketplace add /path/to/DevOffice
+```
+
+플러그인 훅은 설치 후 Codex가 신뢰 여부를 확인할 수 있습니다. DevOffice 훅을 검토하고 신뢰해야 안전 점검과 세션 안내가 실행됩니다.
+
+매니페스트와 Codex 역할 스킬은 `plugin.source.json` 및 `agents/*.md`에서 생성합니다. 원본을 수정한 뒤 `node scripts/build-plugins.js`를 실행하세요. 변경 검사는 `node scripts/build-plugins.js --check`로 할 수 있습니다. 자세한 경계는 [멀티 런타임 구조](./docs/platform-support.md)를 참고하세요.
 
 ## 시작
 

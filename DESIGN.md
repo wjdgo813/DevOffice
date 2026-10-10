@@ -1,6 +1,6 @@
 # DevOffice — 큰 그림 (Big Picture)
 
-> 비개발자가 말로 제품을 만드는 Claude Code 플러그인.
+> 비개발자가 말로 제품을 만드는 Claude Code·Codex 공통 플러그인.
 > Phase 1: 플러그인 / Phase 2: GUI
 
 ---
@@ -36,9 +36,9 @@
 
 ---
 
-## 1. 플랫폼 제약 — 설계를 강제하는 사실들
+## 1. Claude Code 제약 — 설계를 강제하는 사실들
 
-Claude Code 문서에서 확인한, 반드시 알고 설계해야 하는 제약이다.
+아래 사실은 Claude Code 런타임 기준이다. 공통 업무 프로토콜과 상태 형식은 유지하고, Codex 연결부는 `docs/platform-support.md`의 어댑터 규칙을 따른다.
 
 | # | 사실 | 설계에 미치는 영향 |
 |---|---|---|
@@ -337,7 +337,10 @@ S-1과 S9~S12는 → **[JOURNEY.md](./JOURNEY.md)**
 
 ```
 devoffice/
-├── .claude-plugin/plugin.json     name, userConfig(언어·스택 프리셋·배포 대상)
+├── plugin.source.json             양쪽 런타임의 공통 메타데이터 원본
+├── plugin.json                    Codex용 생성 매니페스트
+├── .claude-plugin/plugin.json     Claude Code용 생성 매니페스트와 userConfig
+├── .claude-plugin/marketplace.json Claude Code 마켓플레이스
 ├── skills/                        ← 방법론이 사는 곳
 │   ├── devoffice/SKILL.md         진입점·디스패처 (`/devoffice`)
 │   ├── intake/ prd/ architect/
@@ -350,7 +353,9 @@ devoffice/
 │       └── error-dictionary.md    에러 → 쉬운 말 번역 사전
 ├── agents/                        cto, research, backend, frontend, infra,
 │                                  qa, fixer, env-doctor
-├── hooks/hooks.json
+├── hooks/hooks.json               Claude Code 훅 배선
+├── hooks/adapters/codex/          Codex 이벤트·결과 형식 어댑터
+├── hooks/lib/                     공통 훅 정책
 ├── output-styles/                 ← 비개발자용 출력 규격 강제 (JOURNEY §2.6)
 ├── settings.json                  subagentStatusLine — 대기 중 "지금 뭐 하는 중"
 ├── install.sh                     진입 한 줄 (Node→CC→플러그인→폴더→안내)
@@ -369,6 +374,8 @@ devoffice/
     ├── scaffold/                  스캐폴딩 원본
     └── playbooks/                 프리셋별 역할 규칙집 원본 ← 기여 진입점
 ```
+
+공통 역할 문서는 `agents/*.md`를 원본으로 둔다. `node scripts/build-plugins.js`가 Codex용 역할 Skills를 생성하고 두 런타임의 매니페스트도 갱신한다. 생성물 검사는 `node scripts/build-plugins.js --check`로 한다.
 
 ### 훅 설계 — "지시"가 아니라 "강제"
 

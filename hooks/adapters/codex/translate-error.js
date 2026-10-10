@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 'use strict';
 
-// Claude Code adapter for PostToolUseFailure.
+// Codex reports failed shell commands through PostToolUse (non-zero exit).
 
-const H = require('./lib/hook');
-const errors = require('./lib/error-guide');
+const H = require('../../lib/hook');
+const errors = require('../../lib/error-guide');
 
 H.safely((input) => {
   if (!H.findProject(input.cwd)) return;
@@ -12,7 +12,7 @@ H.safely((input) => {
   if (!additionalContext) return;
   H.emit({
     hookSpecificOutput: {
-      hookEventName: 'PostToolUseFailure',
+      hookEventName: 'PostToolUse',
       additionalContext,
     },
   });
